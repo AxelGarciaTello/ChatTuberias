@@ -36,7 +36,7 @@ int main(void){
 			Al recibir el mensaje "Adiós\n", termina el proceso.
 		*/
 		while(read(tuberia_em_re[0], mensaje, MAX) > 0 &&
-			strcmp(mensaje, "Adiós\n") != 0){
+					strcmp(mensaje, "Adiós\n") != 0){
 			printf("PROCESO HIJO. MENSAJE RECIBIDO: %s\n", mensaje);
 			/*Se pide introducir el mensaje a enviar al proceso padre.*/
 			printf("PROCESO HIJO. MENSAJE ENVIADO: ");
@@ -55,14 +55,14 @@ int main(void){
 		/*
 			El proceso padre (emisor) se encarga de leer un mensaje introducido
 			por medio del teclado y acto seguido escribirlo en la
-			tubería, para que lo reciba el proceso hijo. Después Espera una
+			tubería, para que lo reciba el proceso hijo. Después espera una
 			respuesta por parte del proceso hijo por medio de la otra tubería.
 			Al escribir el mensaje "Adiós\n" acaban los dos procesos.
 		*/
 		while(printf("PROCESO PADRE. MENSAJE ENVIADO: ") != 0 &&
-			fgets(mensaje, sizeof(mensaje), stdin) != NULL &&
-			write(tuberia_em_re[1], mensaje, strlen(mensaje)+1) > 0 &&
-			strcmp(mensaje, "Adiós\n") != 0){
+					fgets(mensaje, sizeof(mensaje), stdin) != NULL &&
+					write(tuberia_em_re[1], mensaje, strlen(mensaje)+1) > 0 &&
+					strcmp(mensaje, "Adiós\n") != 0){
 				/*Se lee el mensaje del proceso hijo y se imprime.*/
 				read(tuberia_re_em[0], mensaje, MAX);
 				printf("PROCESO PADRE. MENSAJE RECIBIDO: %s\n", mensaje);
