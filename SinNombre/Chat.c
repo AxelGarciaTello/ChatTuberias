@@ -1,13 +1,8 @@
-/***
-	Programa para ilustrar el envío de mensajes entre un proceso
-	emisor y otro receptor a través de dos tuberías sin nombre.
-	Estas tuberías permitirán implementar una comunicación
-	bidiraccional. El proceso emisor pedirá un mensaje que le
-	enviará al proceso receptor. Cuando el proceso receptor haya
-	presentado el mensaje por pantalla, solicitará al proceso
-	emisor otro mensaje, indicándole así que está listo y que
-	puede pedirle otro mensaje al usuario.
-***/
+/*
+	Para la implementación de una comunicación bidireccional haremos uso de
+	dos tuberías, la primera enviara un mensaje del proceso padre al
+	proceso hijo y la segunda del proceso hijo al proceso padre.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,18 +28,22 @@ int main(void){
 	}
 	else if (pid == 0){
 		/*Código del proceso hijo.*/
-		/*El proceso hijo (receptor) se encarga de leer un
-		mensaje de la tubería y presentarlo en la pantalla. Al
-		recibir el mensaje "FIN\n", termina el proceso.*/
+		/*
+			El proceso hijo (receptor) se encarga de leer un mensaje de la
+			tubería y presentarlo en la pantalla, después envía un mensaje
+			introducido, por medio del teclado, al proceso padre a través de la
+			otra tubería.
+			Al recibir el mensaje "Adiós\n", termina el proceso.
+		*/
 		while(read(tuberia_em_re[0], mensaje, MAX) > 0 &&
-			strcmp (mensaje, "Adios\n") != 0){
-			printf("PROCESO HIJO. MENSAJE RECIVIDO: %s\n", mensaje);
-			/*Enviamos al proceso emisor un mensaje para indicar
-			que estamos listos para recibir otro mensaje.*/
+			strcmp(mensaje, "Adiós\n") != 0){
+			printf("PROCESO HIJO. MENSAJE RECIBIDO: %s\n", mensaje);
+			/*Se pide introducir el mensaje a enviar al proceso padre.*/
 			printf("PROCESO HIJO. MENSAJE ENVIADO: ");
 			fgets(mensaje, sizeof(mensaje), stdin);
 			write(tuberia_re_em[1], mensaje, strlen(mensaje)+1);
 		}
+		/*Cierre de las tuberías y salida del programa*/
 		close(tuberia_em_re[0]);
 		close(tuberia_em_re[1]);
 		close(tuberia_re_em[0]);
@@ -53,18 +52,22 @@ int main(void){
 	}
 	else{
 		/*Código del proceso padre.*/
-		/*El proceso padre (emisor) se encarga de leer un mensaje
-		de la entrada estándar y acto seguido escribirlo en la
-		tubería, para que lo reciba el proceso hijo. Al escribir
-		el mensaje "FIN\n" acaban los dos procesos*/
+		/*
+			El proceso padre (emisor) se encarga de leer un mensaje introducido
+			por medio del teclado y acto seguido escribirlo en la
+			tubería, para que lo reciba el proceso hijo. Después Espera una
+			respuesta por parte del proceso hijo por medio de la otra tubería.
+			Al escribir el mensaje "Adiós\n" acaban los dos procesos.
+		*/
 		while(printf("PROCESO PADRE. MENSAJE ENVIADO: ") != 0 &&
 			fgets(mensaje, sizeof(mensaje), stdin) != NULL &&
-			write(tuberia_em_re[1],mensaje,
-				strlen(mensaje)+1) > 0 &&
-			strcmp(mensaje, "Adios\n") != 0){
+			write(tuberia_em_re[1], mensaje, strlen(mensaje)+1) > 0 &&
+			strcmp(mensaje, "Adiós\n") != 0){
+				/*Se lee el mensaje del proceso hijo y se imprime.*/
 				read(tuberia_re_em[0], mensaje, MAX);
-				printf("PROCESO PADRE. MENSAJE RECIVIDO: %s\n", mensaje);
+				printf("PROCESO PADRE. MENSAJE RECIBIDO: %s\n", mensaje);
 		}
+		/*Cierre de las tuberías y salida del programa.*/
 		close(tuberia_em_re[0]);
 		close(tuberia_em_re[1]);
 		close(tuberia_re_em[0]);
